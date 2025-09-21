@@ -162,18 +162,11 @@ class ContactCard extends StatelessWidget {
                         height: 14,
                         color: const Color(0xffFFF1D4),
                         errorBuilder: (context, error, stackTrace) {
-                          return Container(
+                          return Image.asset(
+                            AppIcon.delete,
                             width: 14,
                             height: 14,
-                            decoration: const BoxDecoration(
-                              color: Color(0xffFFF1D4),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              color: Color(0xFFE74C3C),
-                              size: 10,
-                            ),
+                            color: const Color(0xffFFF1D4),
                           );
                         },
                       ),
