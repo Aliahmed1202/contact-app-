@@ -22,11 +22,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final List<Contact> _contacts = [];
+  static const int _maxContacts = 6;
 
   void _addContact(Contact contact) {
-    setState(() {
-      _contacts.add(contact);
-    });
+    if (_contacts.length < _maxContacts) {
+      setState(() {
+        _contacts.add(contact);
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Maximum $_maxContacts contacts allowed',
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+          backgroundColor: const Color(0xFFE74C3C),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _deleteContact(int index) {
@@ -70,6 +84,74 @@ class _HomeScreenState extends State<HomeScreen> {
                   SnackBar(
                     content: Text(
                       'Contact deleted successfully',
+                      style: GoogleFonts.poppins(color: Colors.white),
+                    ),
+                    backgroundColor: const Color(0xFF4CAF50),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFE74C3C),
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                'Delete',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteLastContact() {
+    if (_contacts.isEmpty) return;
+    
+    final lastContact = _contacts.last;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: backgroundColor,
+          title: Text(
+            'Delete Last Contact',
+            style: GoogleFonts.poppins(
+              color: textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to delete the last contact: ${lastContact.name}?',
+            style: GoogleFonts.poppins(
+              color: textSecondary,
+              fontSize: 16,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.poppins(
+                  color: textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _contacts.removeLast();
+                });
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Last contact deleted successfully',
                       style: GoogleFonts.poppins(color: Colors.white),
                     ),
                     backgroundColor: const Color(0xFF4CAF50),
@@ -153,22 +235,58 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final contact = await showModalBottomSheet<Contact>(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => const AddContactScreen(),
-          );
-          
-          if (contact != null) {
-            _addContact(contact);
-          }
-        },
-        backgroundColor: textSecondary,
-        child: const Icon(Icons.add, color: AppColors.sheet),
-      ),
+      floatingActionButton: _contacts.isNotEmpty
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Delete last contact FAB (only visible when contacts exist)
+                FloatingActionButton(
+                  onPressed: _deleteLastContact,
+                  backgroundColor: const Color(0xFFE74C3C),
+                  heroTag: "delete_last",
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                // Add contact FAB (only show if under limit)
+                if (_contacts.length < _maxContacts) ...[
+                  const SizedBox(height: 16),
+                  FloatingActionButton(
+                    onPressed: () async {
+                      final contact = await showModalBottomSheet<Contact>(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const AddContactScreen(),
+                      );
+                      
+                      if (contact != null) {
+                        _addContact(contact);
+                      }
+                    },
+                    backgroundColor: textSecondary,
+                    heroTag: "add_contact",
+                    child: const Icon(Icons.add, color: AppColors.sheet),
+                  ),
+                ],
+              ],
+            )
+          : _contacts.length < _maxContacts
+              ? FloatingActionButton(
+                  onPressed: () async {
+                    final contact = await showModalBottomSheet<Contact>(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const AddContactScreen(),
+                    );
+                    
+                    if (contact != null) {
+                      _addContact(contact);
+                    }
+                  },
+                  backgroundColor: textSecondary,
+                  child: const Icon(Icons.add, color: AppColors.sheet),
+                )
+              : null,
     );
   }
 

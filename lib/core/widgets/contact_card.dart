@@ -81,7 +81,6 @@ class ContactCard extends StatelessWidget {
             ),
           ),
           
-          // Contact info
           Expanded(
             flex: 2,
             child: Padding(
@@ -146,7 +145,7 @@ class ContactCard extends StatelessWidget {
                     ],
                   ),
                   
-                  // Delete button
+                  
                   SizedBox(
                     width: double.infinity,
                     height: 32,
@@ -157,7 +156,27 @@ class ContactCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                       ),
-                      icon: const Icon(Icons.delete, color: Color(0xffFFF1D4), size: 14),
+                      icon: Image.asset(
+                        AppIcon.delete,
+                        width: 14,
+                        height: 14,
+                        color: const Color(0xffFFF1D4),
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 14,
+                            height: 14,
+                            decoration: const BoxDecoration(
+                              color: Color(0xffFFF1D4),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: Color(0xFFE74C3C),
+                              size: 10,
+                            ),
+                          );
+                        },
+                      ),
                       label: Text(
                         'Delete',
                         style: GoogleFonts.poppins(
